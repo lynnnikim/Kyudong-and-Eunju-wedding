@@ -448,13 +448,13 @@ main section.film::before{display:none}
 .pol3 .bl{left:4.2%;bottom:4.6%}
 
 /* intro1 (폴라로이드 이미지) */
-.intro.seq1{background:#43080e}
+.intro.seq1{background:#6b0d18}
 .intro.seq1 .in,.intro.seq1 .bt,.intro.seq1 .dd,.intro.seq1 #introBg,.intro.seq1 .tap{display:none!important}
 .intro.seq1::before,.intro.seq1::after{display:none!important}
 .intro .s1img{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .intro.two .s1img{display:none}
 .s2media{-webkit-mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent)}
-.s1img img{-webkit-mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent);display:block;width:min(100%,430px);height:auto;max-height:100%;object-fit:contain}
+.s1img video,.s1img img{-webkit-mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(transparent,#000 4%,#000 96%,transparent);display:block;width:min(100%,430px);height:auto;max-height:100%;object-fit:contain}
 .s1img .s1tap{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12px;font-weight:600;letter-spacing:.2em;margin:0;animation:pulse 2.4s infinite}
 
 /* '화면을 터치해 주세요' 안내: 모서리가 둥근 박스 안에 넣어 잘 보이게 */
@@ -464,7 +464,7 @@ main section.film::before{display:none}
 .intro.seq1 #stage2 .s2in,.intro.seq1 #stage2 .lt-strips,.intro.seq1 #stage2 .paper{display:none!important}
 .intro.seq1 #stage2{background:#ece6da}
 </style>
-<link rel="preload" as="image" href="intro1.jpg">
+<link rel="preload" as="image" href="intro1_poster.jpg">
 </head>
 <body>
 <div class="intro seq1" id="intro" role="button" tabindex="0" aria-label="청첩장 열기">
@@ -703,8 +703,10 @@ const CONFIG = {
   introLocketPhotos: [],    // 로켓 안에 들어갈 사진 2장 (비우면 image01, image04). 예: ['image01.jpg','image04.jpg']
   introDoodle: false,       // 손그림 청첩장 인트로(신랑·신부 캐릭터). false면 이전 방식(영상/인생네컷)으로 돌아갑니다
   introChars: { groom: '', bride: '' }, // (선택) 직접 그린 캐릭터 이미지(PNG)를 쓰려면 파일 이름을 적으세요
+  introFirstVideo: 'intro1.mp4',        // intro1 영상(mp4). 접속하면 바로 재생되고, 끝난 뒤 터치하면 본문으로 넘어갑니다. 안 쓰려면 ''
+  introFirstPoster: 'intro1_poster.jpg', // 영상이 뜨기 전 보여줄 첫 장면 이미지
   introFirst: 'intro1.jpg', // 첫 번째 인트로 화면(intro1) 이미지. 터치하면 intro2가 나오고, 한 번 더 터치하면 본문입니다. 안 쓰려면 ''
-  introFirstBg: '#43080e',  // intro1 이미지 위아래 여백 색 (단색)
+  introFirstBg: '#6b0d18',  // intro1 이미지 위아래 여백 색 (단색)
   introFirstTap: '#f3e4dc', // intro1의 '화면을 터치해 주세요' 글자색
   introGif: '',           // 두 번째 인트로 화면에 GIF/영상을 쓰려면 파일 주소를 적으세요 (예: 'intro2.gif' 또는 'intro2.mp4'). 비워 두면 인생네컷+편지지 화면이 나옵니다
   introPoster: '',          // (선택) 영상 첫 장면 사진 파일 이름. 영상이 로딩되는 동안 보여줍니다 (예: 'intro2.jpg')
@@ -907,28 +909,63 @@ function enter() {
   playMusic();
 }
 
-// intro1: 이미지 한 장(폴라로이드)을 폰 크기로 보여주고, 터치하면 intro2로 넘어감
+// intro1: 로켓이 열리는 영상(mp4)을 폰 크기로 보여줌. 접속하면 바로 재생 → 끝나면 '화면을 터치해 주세요' → 터치하면 본문
+// (영상이 없거나 재생 실패 시에는 intro1.jpg 이미지로 대신 보여줍니다)
 function buildFirst() {
   intro.classList.add('seq1');
-  intro.style.background = C.introFirstBg || '#43080e';
+  intro.style.background = C.introFirstBg || '#6b0d18';
   const box = document.createElement('div'); box.className = 's1img';
-  const im = new Image(); im.alt = '';
   const tap = document.createElement('p'); tap.className = 's1tap'; tap.style.color = C.introFirstTap || '#f3e4dc';
   tap.textContent = (C.introLines && C.introLines.tap) || '화면을 터치해 주세요';
-  box.append(im, tap); intro.append(box);
-  const ext0 = (C.introFirst.match(/\.[A-Za-z0-9]+$/) || [''])[0], stem = C.introFirst.slice(0, C.introFirst.length - ext0.length);
-  const list = [C.introFirst].concat(['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.JPEG', '.PNG'].filter(e => e !== ext0).map(e => stem + e)).concat(['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.PNG'].map(e => C.introFirst + e));   // intro1.jpg.jpg 처럼 확장자가 겹친 경우까지 찾음
-  let k = 0;
-  im.onerror = () => { if (++k < list.length) im.src = encodeURI(list[k]); else { box.remove(); intro.classList.remove('seq1'); intro.style.background = ''; } };
-  im.onload = () => {
-    try {   // 위·아래 여백을 이미지 가장자리 색으로 자연스럽게 채움
-      const r = im.naturalWidth / im.naturalHeight, cw = 48, ch = Math.max(8, Math.round(cw / r)), cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
-      const g = cv.getContext('2d'); g.drawImage(im, 0, 0, cw, ch);
-      const avg = y0 => { const d = g.getImageData(0, y0, cw, 2).data; let R = 0, G = 0, B = 0, n = d.length / 4; for (let i = 0; i < d.length; i += 4) { R += d[i]; G += d[i + 1]; B += d[i + 2]; } return 'rgb(' + Math.round(R / n) + ',' + Math.round(G / n) + ',' + Math.round(B / n) + ')'; };
-      intro.style.background = 'linear-gradient(' + avg(0) + ' 0%,' + avg(0) + ' 38%,' + avg(ch - 2) + ' 62%,' + avg(ch - 2) + ' 100%)';
-    } catch (e) {}
+  let mode = 'img', st = 'ready', v = null;
+  const showTap = on => { tap.style.visibility = on ? 'visible' : 'hidden'; };
+
+  function useImage() {   // 이미지(intro1.jpg) 방식 — 영상이 없을 때의 대체 화면
+    mode = 'img'; st = 'done'; if (v) { v.remove(); v = null; }
+    const im = new Image(); im.alt = ''; box.prepend(im); showTap(true);
+    const ext0 = (C.introFirst.match(/\.[A-Za-z0-9]+$/) || [''])[0], stem = C.introFirst.slice(0, C.introFirst.length - ext0.length);
+    const list = [C.introFirst].concat(['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.JPEG', '.PNG'].filter(e => e !== ext0).map(e => stem + e)).concat(['.jpg', '.jpeg', '.png', '.webp', '.JPG', '.PNG'].map(e => C.introFirst + e));
+    let k = 0;
+    im.onerror = () => { if (++k < list.length) im.src = encodeURI(list[k]); else { box.remove(); intro.classList.remove('seq1'); intro.style.background = ''; } };
+    im.onload = () => {
+      try {   // 위·아래 여백을 이미지 가장자리 색으로 자연스럽게 채움
+        const r = im.naturalWidth / im.naturalHeight, cw = 48, ch = Math.max(8, Math.round(cw / r)), cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+        const g = cv.getContext('2d'); g.drawImage(im, 0, 0, cw, ch);
+        const avg = y0 => { const d = g.getImageData(0, y0, cw, 2).data; let R = 0, G = 0, B = 0, n = d.length / 4; for (let i = 0; i < d.length; i += 4) { R += d[i]; G += d[i + 1]; B += d[i + 2]; } return 'rgb(' + Math.round(R / n) + ',' + Math.round(G / n) + ',' + Math.round(B / n) + ')'; };
+        intro.style.background = 'linear-gradient(' + avg(0) + ' 0%,' + avg(0) + ' 38%,' + avg(ch - 2) + ' 62%,' + avg(ch - 2) + ' 100%)';
+      } catch (e) {}
+    };
+    im.src = encodeURI(list[0]);
+  }
+
+  box.append(tap); intro.append(box);
+  if (C.introFirstVideo) {
+    mode = 'video'; showTap(false);
+    v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.preload = 'auto'; v.loop = false;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); v.setAttribute('aria-hidden', 'true');
+    if (C.introFirstPoster) v.poster = encodeURI(C.introFirstPoster);
+    v.src = encodeURI(C.introFirstVideo);
+    box.prepend(v);
+    const done = () => { st = 'done'; showTap(true); };
+    v.addEventListener('ended', done);
+    v.addEventListener('error', () => { if (st !== 'done') useImage(); });
+    const start = () => { const p = v.play(); if (p && p.catch) p.catch(() => { if (st === 'ready') showTap(true); }); };   // 자동재생이 막히면 첫 터치로 재생
+    v.addEventListener('playing', () => { st = 'playing'; showTap(false); });
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.addEventListener('loadedmetadata', () => { try { v.currentTime = v.duration; } catch (_) {} done(); }, { once: true }); }
+    else start();
+    setTimeout(() => { if (st === 'ready' && v && v.readyState < 2) showTap(true); }, 2500);
+  } else useImage();
+
+  // 터치: 영상 재생 전이면 재생 시작 / 재생 중이면 끝 장면으로 건너뛰기 / 끝난 뒤면 본문으로
+  box.__tap = () => {
+    if (mode === 'video' && v) {
+      if (st === 'ready') { v.play().catch(() => {}); return false; }
+      if (st === 'playing') { try { v.currentTime = Math.max(0, (v.duration || 5.5) - 0.05); } catch (_) {} return false; }
+    }
+    return true;
   };
-  im.src = encodeURI(list[0]);
+  window.__introTap = box.__tap;
 }
 if (C.intro === false) { intro.hidden = true; document.body.classList.add('go'); }
 else {
@@ -966,7 +1003,7 @@ else {
   window.__skip2 = () => { skip2 = true; if (direct && stage === 2) { stage = 1; intro.classList.remove('two'); $('#stage2').setAttribute('aria-hidden', 'true'); } };
   window.__pol = () => { pol = true; };
   if (direct) { stage = 2; intro.classList.add('two'); $('#stage2').setAttribute('aria-hidden', 'false'); $('#s2Tap').textContent = (C.introLines && C.introLines.tap) || '화면을 터치해 주세요'; }
-  const next = () => enter();   // intro1을 터치하면 바로 본문으로
+  const next = () => { if (window.__introTap && !window.__introTap()) return; enter(); };   // intro1: 영상이 끝난 뒤 터치하면 본문으로
   intro.onclick = next;
   intro.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); next(); } });
 }
