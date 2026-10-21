@@ -175,7 +175,7 @@ body.lock{overflow:hidden}
 
 /* 커버 */
 .hero{position:relative;height:100svh;min-height:560px;color:#fff;text-align:center;background:#1c2428}
-.pp{position:absolute;z-index:2;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:40px;height:40px;border:0;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(6px)}
+.pp{position:absolute;z-index:2;right:16px;top:calc(16px + env(safe-area-inset-top,0px));width:40px;height:40px;border:0;border-radius:50%;background:rgba(0,0,0,.35);color:#fff;font-size:12px;cursor:pointer;backdrop-filter:blur(6px)}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.3),transparent 32%,transparent 56%,rgba(255,255,255,.75) 82%,#fff 100%)}
 .hero .t,.hero .b{position:absolute;z-index:1;left:0;right:0}
 #spark{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
@@ -187,7 +187,10 @@ body.lock{overflow:hidden}
 .hero .sig .s1{text-align:left}
 .hero .sig .s2{font-size:clamp(92px,29vw,132px);margin:-4px 0 0 0;text-align:right}
 .hero .b[hidden]{display:none}
-.hero .b{bottom:30%;font-size:15px;color:var(--ink);-webkit-text-stroke:2.5px #fff;paint-order:stroke fill;text-shadow:0 0 4px #fff,0 0 9px rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.8),0 0 26px rgba(255,255,255,.55)}
+.hero .b{z-index:3;bottom:calc(62px + env(safe-area-inset-bottom,0px));font-size:15px;line-height:1.75;color:#000;-webkit-text-stroke:0;text-shadow:none}
+.hero .b span{display:block}
+.hero .b .d{margin-top:10px;font-size:15px}
+.hero .b .v{font-size:14px}
 .go .hero .b{animation:rise 1.2s .8s both}
 .hero .b b{display:block;font-size:19px;font-weight:600}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -361,7 +364,7 @@ main{background:var(--cream)}
 main section{background:var(--cream);padding:68px 28px;--bg:var(--cream)}
 main section.soft{background:var(--cream)}
 main section.info,main section.gal{padding-bottom:68px}
-.hero + section{background:linear-gradient(rgba(246,244,237,0),var(--cream) 150px);padding-top:0}
+.hero + section{background:linear-gradient(rgba(246,244,237,0),var(--cream) 150px);padding-top:160px}
 .hero::after{background:linear-gradient(rgba(0,0,0,.3),transparent 32%,transparent 56%,rgba(246,244,237,.75) 82%,#f6f4ed 100%)}
 .one{background:none;padding:0;position:relative;z-index:3;margin-bottom:-84px;line-height:0}
 .one + section{padding-top:calc(68px + 84px)}
@@ -510,7 +513,7 @@ main section.film::before{display:none}
 <header class="hero">
   <div class="cv ph" id="cover">커버 사진</div>
   <canvas id="spark" aria-hidden="true"></canvas>
-  <div class="b" hidden><b id="hNames"></b><span id="hDate"></span></div>   <!-- 커버 위 글씨는 숨김 (날짜 값은 공유 카드 등에서 쓰이므로 요소는 유지) -->
+  <div class="b"><b id="hNames"></b><span id="hDate" hidden></span><span class="d">2026. 12.06.(일) 오후 1:00</span><span class="v">아젠토피오레 컨벤션 1층 베네치아홀</span></div>
   <button class="pp" id="pp" type="button" hidden aria-label="영상 일시정지">❚❚</button>
 </header>
 
@@ -1138,7 +1141,7 @@ pic($('#cover'), C.cover, '커버 사진'); pic($('#closing'), C.closing, '마�
 // 커버 영상 (소리 없이 자동 재생·반복, 일시정지 버튼 제공)
 if (C.coverVideo) {
   const v = document.createElement('video'), pp = $('#pp');
-  v.src = C.coverVideo; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
+  v.src = C.coverVideo; v.muted = true; v.loop = false; v.playsInline = true; v.preload = 'auto';
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
   if (C.cover) v.poster = C.cover;
   $('#cover').classList.remove('ph'); $('#cover').replaceChildren(v);
