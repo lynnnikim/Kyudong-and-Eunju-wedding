@@ -12,7 +12,7 @@
 <meta property="og:image" content="https://eunjuandgyudongmarried.netlify.app/cover.jpg">
 <meta property="og:url" content="https://eunjuandgyudongmarried.netlify.app/">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Great+Vibes&family=Mrs+Saint+Delafield&family=Herr+Von+Muellerhoff&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Playfair+Display:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:only light;--ink:#222;--sub:#8a8a8a;--line:#ececec;--acc:#d4606a;--soft:#f6f4f3;
 --sans:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;--script:'Great Vibes','Snell Roundhand',cursive}
@@ -181,10 +181,12 @@ body.lock{overflow:hidden}
 #spark{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
 .hero .t{top:calc(7% + env(safe-area-inset-top,0px))}
 .hero .t{text-align:left;padding:0 22px}
-.hero .sig{font-family:'Playfair Display','Cormorant Garamond','Times New Roman',serif;font-style:italic;font-weight:500;letter-spacing:-.01em;color:#fff;margin:0;line-height:1.28;text-shadow:0 2px 14px rgba(0,0,0,.28)}
+.hero .sig{font-family:'Mrs Saint Delafield','Herr Von Muellerhoff','Snell Roundhand',cursive;font-style:normal;font-weight:400;letter-spacing:.02em;color:#fff;margin:0;line-height:1.02;-webkit-text-stroke:.6px #fff;paint-order:stroke fill;text-shadow:0 2px 14px rgba(0,0,0,.3)}
 .hero .sig span{display:block;white-space:nowrap}
-.hero .sig .s1{font-size:clamp(56px,17vw,82px)}
-.hero .sig .s2{font-size:clamp(56px,17vw,82px);margin:0 0 0 36%}
+.hero .sig .s1{font-size:clamp(62px,19vw,88px)}
+.hero .sig .s1{text-align:left}
+.hero .sig .s2{font-size:clamp(92px,29vw,132px);margin:-4px 0 0 0;text-align:right}
+.hero .b[hidden]{display:none}
 .hero .b{bottom:30%;font-size:15px;color:var(--ink);-webkit-text-stroke:2.5px #fff;paint-order:stroke fill;text-shadow:0 0 4px #fff,0 0 9px rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.8),0 0 26px rgba(255,255,255,.55)}
 .go .hero .b{animation:rise 1.2s .8s both}
 .hero .b b{display:block;font-size:19px;font-weight:600}
@@ -506,8 +508,7 @@ main section.film::before{display:none}
 <header class="hero">
   <div class="cv ph" id="cover">커버 사진</div>
   <canvas id="spark" aria-hidden="true"></canvas>
-  <div class="t"><p class="sig"><span class="s1">Getting</span><span class="s2">Married</span></p></div>
-  <div class="b"><b id="hNames"></b><span id="hDate"></span></div>
+  <div class="b" hidden><b id="hNames"></b><span id="hDate"></span></div>   <!-- 커버 위 글씨는 숨김 (날짜 값은 공유 카드 등에서 쓰이므로 요소는 유지) -->
   <button class="pp" id="pp" type="button" hidden aria-label="영상 일시정지">❚❚</button>
 </header>
 
@@ -571,7 +572,8 @@ main section.film::before{display:none}
 </section>
 
 <section class="rsvp">
-  <h2 class="rt">RSVP</h2>
+  <p class="eye">RSVP</p>
+  <h2>참석 여부</h2>
   <p class="rs">기쁜 날, 함께해주시면 더없이 행복할 것 같아요</p>
   <p class="demo" id="demoNote" hidden>미리보기 모드입니다. CONFIG에 Supabase 키를 넣기 전까지는 이 기기에만 저장됩니다.</p>
   <details class="fold">
@@ -698,7 +700,7 @@ const CONFIG = {
       text: '제1주차장 (본관 주차장)\n· 위치: 제주시 서광로 112 (아젠토피오레컨벤션 건물)\n· 주차 가능 대수: 약 450대\n\n제2주차장\n· 위치: 제주시 오라이동 2228-1 (동성마을회관 옆)\n· 본관에서 동쪽 방향 도보 약 5분 소요\n· 주차 가능 대수: 약 180대\n\n· 원활한 주차 및 안전을 위해 반드시 주차요원의 안내에 따라 주차해주시기 바랍니다.' }
   ],
   notices: [
-    { t: '식사 안내', b: '예식 후 3층 식사장소에서 식사가 준비되어 있습니다.' }
+    { t: '식사 안내', b: '예식 후 3층 아르모홀에서 식사가 준비되어 있습니다.' }
   ],
   cover: 'cover.jpg', closing: 'image05.jpg',
   greetingPhoto: 'all photo/15.jpg',   // 인사말 아래에 한 장만 나오는 사진   // 사진 주소 (예: 'images/cover.jpg'), 비워 두면 회색 자리표시. 커버 영상을 쓰면 영상이 뜨기 전 대체 이미지로도 쓰입니다
@@ -963,17 +965,17 @@ function buildFirst() {
     let started = false;
     const go = () => { if (started) return; started = true; const p = v.play(); if (p && p.catch) p.catch(() => { snowGo(); if (st === 'ready') showTap(true); }); };
     const start = () => { if (v.readyState >= 4) go(); else { v.addEventListener('canplaythrough', go, { once: true }); setTimeout(go, 2000); } };   // 충분히 불러온 뒤 재생해서 끊김을 줄임. 자동재생이 막히면 첫 터치로 재생
-    v.addEventListener('playing', () => { st = 'playing'; showTap(false); snowGo(); });
+    v.addEventListener('playing', () => { if (st === 'ready') { st = 'playing'; showTap(false); setTimeout(() => { if (st === 'playing') done(); }, ((v.duration || 5.5) + 4) * 1000); } snowGo(); });   // 혹시 영상이 멈춰도 길이+4초 뒤에는 터치 가능
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.addEventListener('loadedmetadata', () => { try { v.currentTime = v.duration; } catch (_) {} done(); }, { once: true }); }
     else start();
     setTimeout(snowGo, 3000); setTimeout(() => { if (st === 'ready' && v && v.readyState < 2) showTap(true); }, 2500);
   } else { useImage(); window.__snowOn = true; }
 
-  // 터치: 영상 재생 전이면 재생 시작 / 재생 중이면 끝 장면으로 건너뛰기 / 끝난 뒤면 본문으로
+  // 터치: 영상 재생 전이면 재생 시작 / 재생 중이면 무시(끝까지 재생) / 끝난 뒤면 본문으로
   box.__tap = () => {
     if (mode === 'video' && v) {
       if (st === 'ready') { v.play().catch(() => {}); return false; }
-      if (st === 'playing') { try { v.currentTime = Math.max(0, (v.duration || 5.5) - 0.05); } catch (_) {} return false; }
+      if (st === 'playing') return false;   // 영상이 끝날 때까지는 터치해도 넘어가지 않음
     }
     return true;
   };
