@@ -520,7 +520,6 @@ main section.film::before{display:none}
   <div class="cv ph" id="cover">커버 사진</div>
   <canvas id="spark" aria-hidden="true"></canvas>
   <div class="b"><b id="hNames"></b><span id="hDate" hidden></span><span class="d">2026. 12.06.(일) 오후 1:00</span><span class="v">아젠토피오레 컨벤션 1층 베네치아홀</span></div>
-  <button class="pp" id="pp" type="button" hidden aria-label="영상 일시정지">❚❚</button>
 </header>
 
 <section>
@@ -1148,15 +1147,11 @@ pic($('#cover'), C.cover, '커버 사진'); pic($('#closing'), C.closing, '마�
 
 // 커버 영상 (소리 없이 자동 재생·반복, 일시정지 버튼 제공)
 if (C.coverVideo) {
-  const v = document.createElement('video'), pp = $('#pp');
+  const v = document.createElement('video');
   v.src = C.coverVideo; v.muted = true; v.loop = false; v.playsInline = true; v.preload = 'auto';
   v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
   if (C.cover) v.poster = C.cover;
   $('#cover').classList.remove('ph'); $('#cover').replaceChildren(v);
-  const sync = () => { pp.textContent = v.paused ? '▶' : '❚❚'; pp.setAttribute('aria-label', v.paused ? '영상 재생' : '영상 일시정지'); };
-  v.addEventListener('play', sync); v.addEventListener('pause', sync);
-  pp.onclick = () => v.paused ? v.play() : v.pause();
-  pp.hidden = false; sync();
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) v.play().catch(() => {});
 }
 pic($('#d0'), C.greetingPhoto ? encodeURI(C.greetingPhoto) : '', '');
